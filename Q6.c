@@ -1,4 +1,9 @@
-//MT2024159
+/**
+Name:Q6.c
+Author:Thouseef
+Description:Program to take input from STDIN and display on STDOUT
+Date:25nd August 2024
+**/
 #include <unistd.h>   
 #include <stdio.h>    
 

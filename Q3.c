@@ -1,4 +1,4 @@
-//MT2024159
+
 #include <fcntl.h>    // For creat()
 #include <stdio.h>    // For printf()
 #include <unistd.h>   // For close()
