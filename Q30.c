@@ -1,73 +1,36 @@
+/**
+Name:q30.c
+Author:Thouseef
+Description:Program to run a script at a specific time using a Daemon process.
+Date:29th August 2024
+**/
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <time.h>
-
-void start_daemon() {
-    pid_t first_fork = fork();
-
-    if (first_fork < 0) {
-        perror("Fork failed");
-        exit(EXIT_FAILURE);
-    }
-
-    if (first_fork > 0) {
-        exit(EXIT_SUCCESS);
-    }
-
-    if (setsid() < 0) {
-        perror("Setsid failed");
-        exit(EXIT_FAILURE);
-    }
-
-    pid_t second_fork = fork();
-
-    if (second_fork < 0) {
-        perror("Fork failed");
-        exit(EXIT_FAILURE);
-    }
-
-    if (second_fork > 0) {
-        exit(EXIT_SUCCESS);
-    }
-
-    umask(0);
-
-    if (chdir("/") < 0) {
-        perror("Chdir failed");
-        exit(EXIT_FAILURE);
-    }
-
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-}
-
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 int main() {
-    int target_hour = 15;
-    int target_minute = 30;
-
-    start_daemon();
+    char target_time[] = "10:02";
+    char script_command[] = "echo 'Running the script!'";
 
     while (1) {
-        time_t current_time;
-        struct tm *time_info;
+        time_t now = time(NULL);
+        struct tm *ltm = localtime(&now);
 
-        time(&current_time);
-        time_info = localtime(&current_time);
+        char current_time[6];
+        snprintf(current_time, sizeof(current_time), "%02d:%02d", ltm->tm_hour, ltm->tm_min);
 
-        if (time_info->tm_hour == target_hour && time_info->tm_min == target_minute) {
-            system("/path/to/your/script.sh");
-            sleep(60);
+        if (strcmp(target_time, current_time) == 0) {
+            system(script_command);
+            break;
         }
 
-        sleep(30);
+        sleep(60);
     }
 
     return 0;
 }
 /**Output:
+Running the script!
 **/

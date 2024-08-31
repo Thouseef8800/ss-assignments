@@ -2,66 +2,87 @@
 Name:q29.c
 Author:Thouseef
 Description:Program to get scheduling policy and modify the scheduling policy.
-Date:30th August 2024
+Date:29th August 2024
 **/
 #include <stdio.h>
 #include <stdlib.h>
 #include <sched.h>
 #include <errno.h>
+#include <string.h>
 
-void print_policy(int policy) {
-    switch (policy) {
-        case SCHED_OTHER: printf("Current Policy: SCHED_OTHER\n"); break;
-        case SCHED_FIFO: printf("Current Policy: SCHED_FIFO\n"); break;
-        case SCHED_RR: printf("Current Policy: SCHED_RR\n"); break;
-        default: printf("Unknown Policy\n");
+void display_policy(int policy_type) {
+    switch (policy_type) {
+        case SCHED_FIFO:
+            printf("Current scheduling policy: SCHED_FIFO\n");
+            break;
+        case SCHED_RR:
+            printf("Current scheduling policy: SCHED_RR\n");
+            break;
+        case SCHED_OTHER:
+            printf("Current scheduling policy: SCHED_OTHER\n");
+            break;
+        default:
+            printf("Current scheduling policy: Unknown\n");
+            break;
     }
 }
 
-int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <pid> <new_policy>\n", argv[0]);
-        return 1;
-    }
+void apply_policy(int policy_type) {
+    struct sched_param sched_parameters;
+    sched_parameters.sched_priority = sched_get_priority_max(policy_type);
 
-    int pid = atoi(argv[1]);
-    int new_policy = atoi(argv[2]);
-    struct sched_param param;
-    int current_policy;
-
-    current_policy = sched_getscheduler(pid);
-    if (current_policy == -1) {
-        perror("sched_getscheduler");
-        return 1;
-    }
-
-    print_policy(current_policy);
-
-    if (new_policy == 1) new_policy = SCHED_FIFO;
-    else if (new_policy == 2) new_policy = SCHED_RR;
-    else {
-        fprintf(stderr, "Invalid policy\n");
-        return 1;
-    }
-
-    param.sched_priority = sched_get_priority_max(new_policy);
-
-    if (sched_setscheduler(pid, new_policy, &param) == -1) {
+    if (sched_setscheduler(0, policy_type, &sched_parameters) == -1) {
         perror("sched_setscheduler");
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
-    printf("Policy changed successfully.\n");
+    printf("Scheduling policy changed to ");
+    display_policy(policy_type);
+}
 
-    current_policy = sched_getscheduler(pid);
-    if (current_policy == -1) {
+int main() {
+    int policy_type;
+    
+    policy_type = sched_getscheduler(0);
+    if (policy_type == -1) {
         perror("sched_getscheduler");
-        return 1;
+        exit(EXIT_FAILURE);
     }
 
-    print_policy(current_policy);
+    printf("Before changing policy:\n");
+    display_policy(policy_type);
+
+    printf("Changing to SCHED_FIFO:\n");
+    apply_policy(SCHED_FIFO);
+
+    policy_type = sched_getscheduler(0);
+    if (policy_type == -1) {
+        perror("sched_getscheduler");
+        exit(EXIT_FAILURE);
+    }
+    display_policy(policy_type);
+
+    printf("Changing to SCHED_RR:\n");
+    apply_policy(SCHED_RR);
+
+    policy_type = sched_getscheduler(0);
+    if (policy_type == -1) {
+        perror("sched_getscheduler");
+        exit(EXIT_FAILURE);
+    }
+    display_policy(policy_type);
 
     return 0;
 }
-/**Output:
+/**
+Output:
+before changing policy:
+Current scheduling policy: SCHED_OTHER
+Changing to SCHED_FIFO:
+Scheduling policy changed to Current scheduling policy: SCHED_FIFO
+Current scheduling policy: SCHED_FIFO
+Changing to SCHED_RR:
+Scheduling policy changed to Current scheduling policy: SCHED_RR
+Current scheduling policy: SCHED_RR
+
 **/
