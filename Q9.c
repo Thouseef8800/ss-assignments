@@ -33,3 +33,16 @@ int main() {
 
     return 0;
 }
+/**
+File: Q9.txt
+Inode: 3953353
+Number of hard links: 1
+UID: 1000
+GID: 1000
+Size: 20 bytes
+Block size: 4096 bytes
+Number of blocks: 8
+Time of last access: Sat Aug 31 08:45:25 2024
+Time of last modification: Tue Aug 27 10:28:34 2024
+Time of last change: Tue Aug 27 10:28:34 2024 
+**/

@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-/** Output:
-File: text.txt
-File type: Regular file
+/**
+Output:Usage: ./Q14 filename
+
 **/

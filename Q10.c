@@ -48,4 +48,5 @@ int main() {
 
     return 0;
 }
-/** Output:lseek moved the file pointer to: 223 **/
+/** Output:lseek returned: 20
+**/

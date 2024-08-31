@@ -23,4 +23,7 @@ int main() {
 
     return 0;
 }
+/**
+File opened successfully. File descriptor: 3
+**/
 

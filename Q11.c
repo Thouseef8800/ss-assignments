@@ -6,68 +6,104 @@ descriptors and check whether the file is updated properly or not.
 Date:August 27th 2024 
 **/
 #include <stdio.h>
-#include <unistd.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+
+void check_file(const char *filename) {
+    char buffer[1024];
+    int fd = open(filename, O_RDONLY);
+    if (fd < 0) {
+        perror("open");
+        exit(EXIT_FAILURE);
+    }
+    printf("File content:\n");
+    ssize_t bytes_read;
+    while ((bytes_read = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[bytes_read] = '\0';
+        printf("%s", buffer);
+    }
+    close(fd);
+}
 
 int main() {
-    int fd, fd_dup, fd_dup2, fd_fcntl;
-    ssize_t bytes_written;
-    const char *text = "Appended text\n";
-
-    fd = open("Q11.txt", O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR);
-    if (fd == -1) {
-        perror("Error opening file");
-        return 1;
+    const char *filename = "Q11.txt";
+    const char *text = "Program to use dup and dup2.\n";
+    int fd = open(filename, O_WRONLY | O_APPEND | O_CREAT, 0644);
+    if (fd < 0) {
+        perror("open");
+        exit(EXIT_FAILURE);
     }
-
-    fd_dup = dup(fd);
-    if (fd_dup == -1) {
-        perror("Error duplicating file descriptor using dup");
+    if (write(fd, text, strlen(text)) < 0) {
+        perror("write");
         close(fd);
-        return 1;
+        exit(EXIT_FAILURE);
     }
-
-    fd_dup2 = dup2(fd, 100);
-    if (fd_dup2 == -1) {
-        perror("Error duplicating file descriptor using dup2");
+    int fd_dup = dup(fd);
+    if (fd_dup < 0) {
+        perror("dup");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+    if (write(fd_dup, "Added with dup", 15) < 0) {
+        perror("write dup");
         close(fd);
         close(fd_dup);
-        return 1;
+        exit(EXIT_FAILURE);
     }
-
-    fd_fcntl = fcntl(fd, F_DUPFD, 200);
-    if (fd_fcntl == -1) {
-        perror("Error duplicating file descriptor using fcntl");
+    int fd_dup2 = dup2(fd, 100);
+    if (fd_dup2 < 0) {
+        perror("dup2");
+        close(fd);
+        close(fd_dup);
+        exit(EXIT_FAILURE);
+    }
+    if (write(fd_dup2, "Added with dup2\n", 17) < 0) {
+        perror("write dup2");
         close(fd);
         close(fd_dup);
         close(fd_dup2);
-        return 1;
+        exit(EXIT_FAILURE);
     }
-
-    bytes_written = write(fd, text, 14);
-    if (bytes_written == -1) {
-        perror("Error writing to file with original descriptor");
+    int fd_fcntl = fcntl(fd, F_DUPFD, 0);
+    if (fd_fcntl < 0) {
+        perror("fcntl");
+        close(fd);
+        close(fd_dup);
+        close(fd_dup2);
+        exit(EXIT_FAILURE);
     }
-
-    bytes_written = write(fd_dup, text, 14);
-    if (bytes_written == -1) {
-        perror("Error writing to file with dup descriptor");
+    if (write(fd_fcntl, "Added with fcntl\n", 18) < 0) {
+        perror("write fcntl");
+        close(fd);
+        close(fd_dup);
+        close(fd_dup2);
+        close(fd_fcntl);
+        exit(EXIT_FAILURE);
     }
-
-    bytes_written = write(fd_dup2, text, 14);
-    if (bytes_written == -1) {
-        perror("Error writing to file with dup2 descriptor");
-    }
-
-    bytes_written = write(fd_fcntl, text, 14);
-    if (bytes_written == -1) {
-        perror("Error writing to file with fcntl descriptor");
-    }
-
     close(fd);
     close(fd_dup);
     close(fd_dup2);
     close(fd_fcntl);
-
+    
+    check_file(filename);
+    
     return 0;
 }
+/** Output:File content:
+MT2024159
+Hi 
+thouseef ahmed 
+	
+Appended text
+Appended text
+Appended text
+Appended text
+Appended text
+Appended text
+Appended text
+Appended text
+Program to use dup and dup2.
+
+**/

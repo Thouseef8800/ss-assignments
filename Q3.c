@@ -1,4 +1,9 @@
-
+/**
+Name:Q3.c
+Author:Thouseef
+DEscription:Program to create a file and print the file descriptor value
+Date:23th August 2024
+**/
 #include <fcntl.h>    // For creat()
 #include <stdio.h>    // For printf()
 #include <unistd.h>   // For close()
@@ -20,3 +25,6 @@ int main(){
 
     return 0;
 }
+/**
+File created successfully. File descriptor: 3
+**/
