@@ -41,6 +41,5 @@ int main() {
 
     return 0;
 }
-/** Output:File is opened in read-write mode.
-O_APPEND flag is set.
+/** Output:Opening mode of Q12.txt: r
 **/
