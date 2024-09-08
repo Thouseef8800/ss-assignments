@@ -1,6 +1,6 @@
 /**
 Name:q26.c
-Author:Pavan
+Author:Thouseef
 Description:Write a program to execute an executable program.
 a. use some executable program
 b. pass some input to an executable program.
@@ -47,6 +47,6 @@ int main(int argc, char *argv[]) {
 }
 /**Output:
 Parent process (PID: 6581) waiting for child (PID: 6582) to finish...
-Hello, Pavan!
+Hello, Thouseef!
 Child process exited with status 0
 **/
